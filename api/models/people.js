@@ -2,20 +2,39 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class People extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+    // static associate(models) {
+    // }
   }
   People.init(
     {
-      name: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { msg: "Please enter your name" },
+          notEmpty: true,
+          blankField(value) {
+            if (value.trim() === "") {
+              throw new Error("The field name can not be blank");
+            }
+          },
+          nameLength(value) {
+            if (value.length < 3 || value.length > 28) {
+              throw new Error("The name must be at least 3 characters long");
+            }
+          },
+        },
+      },
       active: DataTypes.BOOLEAN,
-      email: DataTypes.STRING,
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          notNull: { msg: "Please enter your email address" },
+          isEmail: true,
+        },
+      },
       role: DataTypes.STRING,
     },
     {
