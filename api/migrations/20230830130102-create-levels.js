@@ -2,23 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("People", {
+    await queryInterface.createTable("Levels", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
-      },
-      active: {
-        type: Sequelize.BOOLEAN,
-      },
-      email: {
-        type: Sequelize.STRING,
-      },
-      role: {
+      level_desc: {
         type: Sequelize.STRING,
       },
       createdAt: {
@@ -31,8 +22,8 @@ module.exports = {
       },
     });
   },
-  // eslint-disable-next-line no-unused-vars  
+  // eslint-disable-next-line no-unused-vars
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("People");
+    await queryInterface.dropTable("Levels");
   },
 };
