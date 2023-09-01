@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const errorHandler = (err,req, res, next) => {
   console.error("Error in controller: ", err);
 

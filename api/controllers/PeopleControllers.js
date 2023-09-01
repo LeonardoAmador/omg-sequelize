@@ -22,7 +22,7 @@ class PeopleControllers {
         throw new Error(`Person not found - ID ${id}`);
       }
 
-      res.status(200).send(searchedPerson.toJSON());
+      res.status(200).json(searchedPerson);
     } catch (error) {
       next(error);
     }
@@ -65,7 +65,7 @@ class PeopleControllers {
 
       const updatedPerson = await People.findOne({ where: { id: Number(id) } });
 
-      res.status(200).send(updatedPerson.toJSON());
+      res.status(200).json(updatedPerson);
     } catch (error) {
       next(error);
     }

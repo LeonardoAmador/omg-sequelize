@@ -11,6 +11,7 @@ module.exports = {
       },
       level_desc: {
         type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
