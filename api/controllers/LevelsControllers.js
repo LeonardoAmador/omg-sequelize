@@ -1,6 +1,18 @@
 const { Levels } = require("../models/index");
 
 class LevelsControllers {
+  
+  static async isLevelExists(res, id) {
+    const level = await Levels.findByPk(id);
+
+    if (!level) {
+      return res.send({ 
+        success: false, 
+        message: `Level with ID ${id} does not exist` 
+      });
+    }
+  }
+
   static getAllLevels = async (req, res, next) => {
     try {
       const allLevels = await Levels.findAll();
@@ -58,7 +70,7 @@ class LevelsControllers {
     const newLevelInfo = req.body;
 
     try {
-      await isLevelExists(res, id);
+      await LevelsControllers.isLevelExists(res, id);
 
       await Levels.update(newLevelInfo, { where: { id: Number(id) } });
 
@@ -74,7 +86,7 @@ class LevelsControllers {
     const { id } = req.params;
 
     try {
-      await isLevelExists(res, id);
+      await LevelsControllers.isLevelExists(res, id);
 
       await Levels.destroy({ where: { id: Number(id) } });
 
@@ -84,16 +96,5 @@ class LevelsControllers {
     }
   };
 }
-
-const isLevelExists = async (res, id) => {
-  const level = await Levels.findByPk(id);
-
-  if (!level) {
-    return res.send({ 
-      success: false, 
-      message: `Level with ID ${id} does not exist` 
-    });
-  }
-};
 
 module.exports = LevelsControllers;

@@ -1,6 +1,7 @@
 const express = require("express");
 const people = require("./peopleRoutes");
 const levels = require("./levelsRoutes");
+const classes = require("./classesRoutes");
 
 module.exports = (app) => {
   app.route("/").get((req, res) => {
@@ -10,6 +11,7 @@ module.exports = (app) => {
   app.use(
     express.json(), 
     people, 
-    levels
+    levels,
+    classes
   );
 };
