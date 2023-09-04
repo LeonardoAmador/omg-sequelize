@@ -8,7 +8,7 @@ class PeopleControllers {
     } catch (error) {
       next(error);
     }
-  };git 
+  };
 
   static getPersonById = async (req, res, next) => {
     try {
@@ -65,7 +65,7 @@ class PeopleControllers {
 
       const updatedPerson = await People.findOne({ where: { id: Number(id) } });
 
-      res.status(200).json(updatedPerson);
+      return res.status(200).json(updatedPerson);
     } catch (error) {
       next(error);
     }
@@ -78,11 +78,43 @@ class PeopleControllers {
       const deletedPerson = await People.destroy({ where: { id: Number(id) } });
 
       if (!deletedPerson) {
-        res.status(409).send("Could not delete the person");
+        return res.status(409).send("Could not delete the person");
       }
 
-      res.status(200).send({ message: `Person ID - ${id} deleted`});
+      return res.status(200).send({ message: `Person ID - ${id} deleted` });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  static restorePerson = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+      if (isNaN(id) || id <= 0) {
+        return res
+          .status(400)
+          .send({ success: false, message: "Invalid ID parameter" });
+      }
+
+      const restoredPerson = await People.restore({
+        where: { id: Number(id) },
+      });
+
+      if (!restoredPerson) {
+        return res
+          .status(404)
+          .send({
+            success: false,
+            message: `Can not restore person - ID ${id}`,
+          });
+      }
+
+      return res
+        .status(200)
+        .send({ success: true, message: `id - ${id} restored` });
+    } catch (error) {
+      console.error("Error in restorePerson:", error);
       next(error);
     }
   };
@@ -92,9 +124,9 @@ class PeopleControllers {
       const { studentId, enrollmentId } = req.params;
 
       const searchedEnrollment = await Enrollment.findOne({
-        where: { 
+        where: {
           id: Number(enrollmentId),
-          student_id: Number(studentId)
+          student_id: Number(studentId),
         },
       });
 
@@ -110,7 +142,7 @@ class PeopleControllers {
 
   static registerEnrollment = async (req, res, next) => {
     const { studentId } = req.params;
-    const enrollment  = { ...req.body, student_id: Number(studentId) };
+    const enrollment = { ...req.body, student_id: Number(studentId) };
 
     try {
       const newEnrollment = await Enrollment.create(enrollment);
@@ -136,15 +168,15 @@ class PeopleControllers {
         throw new Error(`Enrollment not found - ID ${enrollmentId}`);
       }
 
-      await Enrollment.update(newInfo, { 
-        where: { 
+      await Enrollment.update(newInfo, {
+        where: {
           id: Number(enrollmentId),
-          student_id: Number(studentId)
-        } 
+          student_id: Number(studentId),
+        },
       });
 
-      const updatedEnrollment = await Enrollment.findOne({ 
-        where: { id: Number(enrollmentId) } 
+      const updatedEnrollment = await Enrollment.findOne({
+        where: { id: Number(enrollmentId) },
       });
 
       res.status(200).json(updatedEnrollment);
@@ -157,17 +189,19 @@ class PeopleControllers {
     const { enrollmentId } = req.params;
 
     try {
-      const deletedEnrollment = await Enrollment.destroy({ 
-        where: { 
-          id: Number(enrollmentId) 
-        } 
+      const deletedEnrollment = await Enrollment.destroy({
+        where: {
+          id: Number(enrollmentId),
+        },
       });
 
       if (!deletedEnrollment) {
         res.status(409).send("Could not delete the person");
       }
 
-      res.status(200).send({ message: `Enrollment ID - ${enrollmentId} deleted`});
+      res
+        .status(200)
+        .send({ message: `Enrollment ID - ${enrollmentId} deleted` });
     } catch (error) {
       next(error);
     }

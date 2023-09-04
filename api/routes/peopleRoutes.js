@@ -6,6 +6,7 @@ router
   .get("/people", PeopleControllers.getAllPeople)
   .get("/people/:id", PeopleControllers.getPersonById)
   .post("/people", PeopleControllers.registerPerson)
+  .post("/people/:id/restore", PeopleControllers.restorePerson)
   .put("/people/:id", PeopleControllers.updatePerson)
   .delete("/people/:id", PeopleControllers.deletePerson)
   .get("/people/:studentId/enrollment/:enrollmentId", PeopleControllers.getEnrollment)
