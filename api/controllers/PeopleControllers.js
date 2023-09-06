@@ -1,6 +1,14 @@
 const { People, Enrollment } = require("../models/index");
 
 class PeopleControllers {
+  static validateId = (id, res) => {
+    if (isNaN(id) || id <= 0) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Invalid ID parameter" });
+    }
+  };
+
   static getAllPeople = async (req, res, next) => {
     try {
       const peopleList = await People.findAll();
@@ -91,23 +99,17 @@ class PeopleControllers {
     const { id } = req.params;
 
     try {
-      if (isNaN(id) || id <= 0) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Invalid ID parameter" });
-      }
+      PeopleControllers.validateId(id, res);
 
-      const restoredPerson = await People.restore({
+      const personRestored = await People.restore({
         where: { id: Number(id) },
       });
 
-      if (!restoredPerson) {
-        return res
-          .status(404)
-          .send({
-            success: false,
-            message: `Can not restore person - ID ${id}`,
-          });
+      if (!personRestored) {
+        return res.status(404).send({
+          success: false,
+          message: `Can not restore person - ID ${id}`,
+        });
       }
 
       return res
@@ -203,6 +205,32 @@ class PeopleControllers {
         .status(200)
         .send({ message: `Enrollment ID - ${enrollmentId} deleted` });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  static restoreEnrollment = async (req, res, next) => {
+    const { enrollmentId } = req.params;
+
+    try {
+      PeopleControllers.validateId(enrollmentId, res);
+
+      const enrollmentRestored = await Enrollment.restore({
+        where: { id: Number(enrollmentId) },
+      });
+
+      if (!enrollmentRestored) {
+        return res.status(404).send({
+          success: false,
+          message: `Can not restore enrollment - ID ${enrollmentId}`,
+        });
+      }
+
+      return res
+        .status(200)
+        .send({ success: true, message: `id - ${enrollmentId} restored` });
+    } catch (error) {
+      console.error("Error in restoreEnrollment:", error);
       next(error);
     }
   };

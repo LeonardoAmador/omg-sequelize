@@ -11,6 +11,7 @@ router
   .delete("/people/:id", PeopleControllers.deletePerson)
   .get("/people/:studentId/enrollment/:enrollmentId", PeopleControllers.getEnrollment)
   .post("/people/:studentId/enrollment", PeopleControllers.registerEnrollment)
+  .post("/people/:studentId/enrollment/:enrollmentId/restore", PeopleControllers.restoreEnrollment)
   .put("/people/:studentId/enrollment/:enrollmentId", PeopleControllers.updateEnrollment)
   .delete("/people/:studentId/enrollment/:enrollmentId", PeopleControllers.deleteEnrollment);
   

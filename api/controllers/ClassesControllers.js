@@ -95,6 +95,30 @@ class ClassesControllers {
       next(error);
     }
   };
+
+  static restoreClass = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+      const classRestored = await Classes.restore({
+        where: { id: Number(id ) },
+      });
+
+      if (!classRestored) {
+        return res.status(404).send({
+          success: false,
+          message: `Can not restore class - ID ${id}`,
+        });
+      }
+
+      return res
+        .status(200)
+        .send({ success: true, message: `id - ${id} restored` });
+    } catch (error) {
+      console.error("Error in restoreClass:", error);
+      next(error);
+    }
+  };
 }
 
 module.exports = ClassesControllers;

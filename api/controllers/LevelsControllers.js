@@ -95,6 +95,31 @@ class LevelsControllers {
       next(error);
     }
   };
+
+  static restoreLevel = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+
+      const levelRestored = await Levels.restore({
+        where: { id: Number(id) },
+      });
+
+      if (!levelRestored) {
+        return res.status(404).send({
+          success: false,
+          message: `Can not restore level - ID ${id}`,
+        });
+      }
+
+      return res
+        .status(200)
+        .send({ success: true, message: `id - ${id} restored` });
+    } catch (error) {
+      console.error("Error in restoreLevel:", error);
+      next(error);
+    }
+  };
 }
 
 module.exports = LevelsControllers;
