@@ -4,7 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   class People extends Model {
     static associate(models) {
       People.hasMany(models.Classes, { foreignKey: "instructor_id" });
-      People.hasMany(models.Enrollment, { foreignKey: "student_id" });
+      People.hasMany(models.Enrollment, { 
+        foreignKey: "student_id",
+        scope: { status: "confirmed" },
+        as: "enrolledClasses"
+      });
     }
   }
   People.init(
@@ -42,6 +46,12 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       paranoid: true,
+      defaultScope: {
+        where: { active: true }
+      },
+      scopes: {
+        all: { where: {} }
+      }
     },
     {
       sequelize,

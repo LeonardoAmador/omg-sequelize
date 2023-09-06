@@ -9,9 +9,18 @@ class PeopleControllers {
     }
   };
 
-  static getAllPeople = async (req, res, next) => {
+  static getActivePeople = async (req, res, next) => {
     try {
       const peopleList = await People.findAll();
+      res.status(200).json(peopleList);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static getAllPeople = async (req, res, next) => {
+    try {
+      const peopleList = await People.scope("all").findAll();
       res.status(200).json(peopleList);
     } catch (error) {
       next(error);
@@ -231,6 +240,35 @@ class PeopleControllers {
         .send({ success: true, message: `id - ${enrollmentId} restored` });
     } catch (error) {
       console.error("Error in restoreEnrollment:", error);
+      next(error);
+    }
+  };
+
+  static getPersonEnrollment = async (req, res, next) => {
+    const { studentId } = req.params;
+
+    try {
+      const person = await People.findOne({ where: { id: Number(studentId) } });
+
+      if (!person) {
+        return res
+          .status(404)
+          .json({ message: `Person not found - ID ${studentId}` });
+      }
+
+      const enrollments = await person.getEnrolledClasses();
+
+      if (enrollments.length === 0) {
+        return res
+          .status(200)
+          .json({
+            message: "No enrollments confirmed for this person.",
+            data: [],
+          });
+      }
+
+      return res.status(200).json(enrollments);
+    } catch (error) {
       next(error);
     }
   };

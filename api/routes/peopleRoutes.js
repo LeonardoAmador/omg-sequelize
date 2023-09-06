@@ -3,8 +3,10 @@ const PeopleControllers = require("../controllers/PeopleControllers");
 const router = express.Router();
 
 router
-  .get("/people", PeopleControllers.getAllPeople)
+  .get("/people", PeopleControllers.getActivePeople)
+  .get("/people/all", PeopleControllers.getAllPeople)
   .get("/people/:id", PeopleControllers.getPersonById)
+  .get("/people/:studentId/enrollment", PeopleControllers.getPersonEnrollment)
   .post("/people", PeopleControllers.registerPerson)
   .post("/people/:id/restore", PeopleControllers.restorePerson)
   .put("/people/:id", PeopleControllers.updatePerson)
