@@ -1,4 +1,5 @@
 const { Classes } = require("../models/index");
+const { Op } = require("sequelize");
 
 class ClassesControllers {
   
@@ -13,15 +14,25 @@ class ClassesControllers {
     }
   }
 
-  static getAllClasses = async (req, res, next) => {
+  static getAllClassesByDateRange  = async (req, res, next) => {
+    const { initial_date, final_date  } = req.query;
+    const where = {};
+
+    if (initial_date || final_date) {
+      where.start_date = {};
+    }
+
+    initial_date ? where.start_date[Op.gte] = initial_date : null;
+    final_date ? where.start_date[Op.lte] = final_date : null;
+    
     try {
-      const allClasses = await Classes.findAll();
+      const allClasses = await Classes.findAll({ where });
       
-      if (!allClasses.length) {
+      if (allClasses.length === 0) {
         return res.status(404).send({ success: false, message: "No classes found!"});
       }
 
-      res.status(200).json(allClasses);
+      return res.status(200).json(allClasses);
 
     } catch (error) {
       next(error);

@@ -1,5 +1,5 @@
-const { People, Enrollment } = require("../models/index");
-
+const { People, Enrollment, sequelize } = require("../models/index");
+const Sequelize = require("sequelize");
 class PeopleControllers {
   static validateId = (id, res) => {
     if (isNaN(id) || id <= 0) {
@@ -126,6 +126,33 @@ class PeopleControllers {
         .send({ success: true, message: `id - ${id} restored` });
     } catch (error) {
       console.error("Error in restorePerson:", error);
+      next(error);
+    }
+  };
+
+  static cancelPerson = async (req, res, next) => {
+    const { studentId } = req.params;
+
+    try {
+      await sequelize.transaction(async (transaction) => {
+        await People.update(
+          { active: false },
+          { where: { id: Number(studentId) } },
+          { transaction }
+        );
+        await Enrollment.update(
+          { status: "canceled" },
+          { where: { student_id: Number(studentId) } },
+          { transaction }
+        );
+      });
+
+      return res
+        .status(200)
+        .json({
+          message: `Enrollments for person with ID ${studentId} canceled`,
+        });
+    } catch (error) {
       next(error);
     }
   };
@@ -259,15 +286,58 @@ class PeopleControllers {
       const enrollments = await person.getEnrolledClasses();
 
       if (enrollments.length === 0) {
-        return res
-          .status(200)
-          .json({
-            message: "No enrollments confirmed for this person.",
-            data: [],
-          });
+        return res.status(200).json({
+          message: "No enrollments confirmed for this person.",
+          data: [],
+        });
       }
 
       return res.status(200).json(enrollments);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static getEnrollmentsByClass = async (req, res, next) => {
+    const { classId } = req.params;
+
+    try {
+      const allEnrollments = await Enrollment.findAndCountAll({
+        where: {
+          class_id: Number(classId),
+          status: "confirmed",
+        },
+        limit: 20,
+        order: [["student_id", "DESC"]],
+      });
+
+      if (allEnrollments.count === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No confirmed enrollments found for this class.",
+        });
+      }
+
+      return res.status(200).json(allEnrollments);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static getCrowdedClasses = async (req, res, next) => {
+    const classCapacity = 10;
+
+    try {
+      const crowdedClasses = await Enrollment.findAndCountAll({
+        where: {
+          status: "confirmed",
+        },
+        attributes: ["class_id"],
+        group: ["class_id"],
+        having: Sequelize.literal(`count(class_id) >= ${classCapacity}`),
+      });
+
+      return res.status(200).json(crowdedClasses.count);
     } catch (error) {
       next(error);
     }

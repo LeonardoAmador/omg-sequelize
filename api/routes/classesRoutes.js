@@ -3,7 +3,7 @@ const ClassesControllers = require("../controllers/ClassesControllers");
 const router = express.Router();
 
 router
-  .get("/classes", ClassesControllers.getAllClasses)
+  .get("/classes", ClassesControllers.getAllClassesByDateRange)
   .get("/classes/:id", ClassesControllers.getClassById)
   .post("/classes", ClassesControllers.registerClass)
   .post("/classes/:id/restore", ClassesControllers.restoreClass)
